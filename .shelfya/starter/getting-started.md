@@ -1,49 +1,67 @@
-# Getting Started with the Three.js Starter Project
+# Getting Started Module
 
 ## Overview
-This starter module provides a ready-to-use environment for Three.js development using Vite as the build tool. It enables rapid setup and launching of 3D graphics applications that render directly into an HTML canvas. The project is structured for ease-of-use, supporting both development and production builds, and uses modern frontend tooling and workflows.
+The Getting Started module provides a ready-to-use development environment for prototyping and launching Three.js web projects. It integrates Vite as a local server and build tool, configures project structure, and establishes a boilerplate Three.js scene. This module enables developers to quickly start visualizing 3D graphics in the browser with minimal setup.
 
 ## Key Features
-- **Vite Development Server**: Instantly runs a fast local server at `localhost:8080` for iterative development, complete with live reload and network access.
-- **Three.js Integration**: Includes the full Three.js library for building advanced WebGL scenes and 3D content.
-- **Production Build Pipeline**: One-command build outputs fully bundled and optimized assets to the `/dist` directory, ready for deployment.
-- **Project Structure & Index Template**: Organized folder structure (`src/`, `static/`, `dist/`) and pre-wired HTML (`index.html`) with Three.js canvas and script loading.
+- **Local Development Server**: Launches a Vite-powered development server for instant preview and hot-reloading at `localhost:8080`.
+- **Production Build System**: Uses Vite to bundle and optimize project files into the `dist/` directory for deployment.
+- **Three.js Scene Boilerplate**: Instantiates a cube scene in Three.js rendered onto a responsive HTML canvas.
+- **Simple Project Structure**: Organized with clear separation between configuration, assets, scripts, and output directories.
+- **Automated Dependency Management**: Handles npm-based installation and updates for critical libraries like `three` and `vite`.
 
 ## System Errors
-- **Port Conflict Error**: If port 8080 is already in use, starting the dev server will fail (e.g., "EADDRINUSE").  
-  *Resolution*: Stop the conflicting process or change the port in `vite.config.js`.
-- **Dependency Missing Error**: If dependencies are not installed, commands will fail with errors about missing packages.  
-  *Resolution*: Run `npm install` before starting the server or building.
-- **Build Output Error**: If the `dist/` directory isn't created as expected (permissions or misconfiguration).  
-  *Resolution*: Ensure you have write permissions to the parent directory and the build configuration remains unaltered.
+- **Port Already In Use**: If `localhost:8080` is occupied, the dev server may fail to start.  
+  **Resolution**: Stop the conflicting service or change the port in `vite.config.js`.
+- **Missing Dependencies**: Running `npm run dev` without `npm install` may result in `module not found` errors.  
+  **Resolution**: Always run `npm install` before starting or building the project.
+- **Canvas Not Displayed**: If the `<canvas class="webgl">` selector is missing or misnamed, rendering will not occur.  
+  **Resolution**: Ensure the HTML contains `<canvas class="webgl"></canvas>`.
 
 ## Usage Examples
 
 ```bash
-# Step 1: Install project dependencies (run once)
+# 1. Install project dependencies (run once)
 npm install
 
-# Step 2: Start local development server (live reload at http://localhost:8080)
+# 2. Start the development server (for local previews)
 npm run dev
 
-# Step 3: Build production assets into the 'dist/' directory
+# 3. Build the project for production (output in /dist)
 npm run build
 ```
 
-```html
-<!-- Example: Rendering Three.js in your app (src/index.html) -->
-<canvas class="webgl"></canvas>
-<script type="module" src="./script.js"></script>
+```javascript
+// Main entry point (src/script.js)
+import * as THREE from 'three';
+
+const canvas = document.querySelector('canvas.webgl');
+const scene = new THREE.Scene();
+
+// Basic cube mesh
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// Camera setup
+const camera = new THREE.PerspectiveCamera(75, 800 / 600);
+camera.position.z = 3;
+scene.add(camera);
+
+// Renderer initialization
+const renderer = new THREE.WebGLRenderer({ canvas });
+renderer.setSize(800, 600);
+renderer.render(scene, camera);
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  dependencies["Node.js, Vite, Three.js NPM Packages"] --> thisModule["Three.js Starter Project"]
-  thisModule --> usedBy["App Developers / Web Browsers"]
-
-  dependencies --> details["[Provides Build Tools, Library APIs, and Module Loader]"]
-  thisModule --> process["[Configures Vite, Loads Three.js, and Renders to Canvas]"]
-  usedBy --> consumers["[Serves Built Site, Enables 3D Web App Development]"]
+  dependencies["Node.js, npm, Vite, Three.js"] --> thisModule["Getting Started Module"]
+  thisModule --> usedBy["Three.js Project Developer"]
+  dependencies --> details["[Handles package installation, configuration files]"]
+  thisModule --> process["[Launch dev server, build output, initialize Three.js scene]"]
+  usedBy --> consumers["[Views live 3D scene in browser, deploys built assets]"]
 ```

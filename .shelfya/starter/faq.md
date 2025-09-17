@@ -1,36 +1,32 @@
 # Starter FAQ
 
 ## Overview
-The **Starter** module serves as the foundational toolkit for initializing, running, and building a Three.js project. It streamlines the setup process, allowing developers to quickly get started with a local development environment, manage dependencies, and prepare production-ready builds. This module acts as the entry point for anyone beginning a Three.js journey in this repository.
+The **Starter** module provides a streamlined setup and development workflow for Three.js-based projects. It helps developers quickly install dependencies, start a local development server, and build ready-to-deploy production bundles. This module ensures consistency and reduces setup friction for teams working with Three.js.
 
 ## Key Features
-- **Dependency Management**: Installs all required libraries and modules for the project with a single command.
-- **Development Server**: Launches a local server (default: `localhost:8080`) for real-time project development and testing.
-- **Production Build Tooling**: Compiles and bundles source files into optimized assets within the `dist/` directory for deployment.
+- **Dependency Installation**: Automatically installs all necessary Node.js packages for the project environment.
+- **Local Development Server**: Easily launches a development server on `localhost:8080` for live testing and preview.
+- **Production Build**: Offers a one-command solution to build the project for production, outputting files to the `dist/` directory.
+- **Cross-Platform Workflow**: Designed to be compatible with major operating systems supporting Node.js.
 
 ## System Errors
-- **Missing Node.js**:  
-  *Description*: The environment lacks Node.js, preventing any npm commands from running.  
-  *Resolution*: Download and install the latest version of Node.js from [nodejs.org](https://nodejs.org/en/download/).
-
-- **Dependency Installation Failure**:  
-  *Description*: Errors occur during `npm install`, often due to missing internet connection or permission issues.  
-  *Resolution*: Check your network connection, ensure correct permissions, and, if relevant, try running with `sudo` on Unix-based systems.
-
-- **Port Conflict (8080 in use)**:  
-  *Description*: The development server fails to start because port 8080 is already occupied.  
-  *Resolution*: Close the application using that port or modify the configuration to use a different port.
+- **Dependency Installation Error**: Occurs when running `npm install` if dependencies are missing or there are network issues.
+  - **Resolution**: Ensure a stable internet connection and that Node.js/npm are installed and up to date. Re-run `npm install`.
+- **Server Startup Error**: When running `npm run dev`, the server may fail to start if the port is in use or dependencies are missing.
+  - **Resolution**: Check if another service is using port 8080 and stop it, or change the port. Ensure dependencies are installed.
+- **Build Error**: Errors during `npm run build` can be caused by misconfigured project files or incompatible modules.
+  - **Resolution**: Review console error messages, check configuration files (`package.json`, etc.), and resolve any code issues.
 
 ## Usage Examples
 
 ```bash
-# Step 1: Install all project dependencies (only needed once)
+# 1. Install all project dependencies (run once):
 npm install
 
-# Step 2: Start the local development server
+# 2. Start the development server at http://localhost:8080/
 npm run dev
 
-# Step 3: Build the project for production deployment
+# 3. Build the project for production (output in 'dist/' folder):
 npm run build
 ```
 
@@ -38,8 +34,9 @@ npm run build
 
 ```mermaid
 flowchart LR
-  dependencies["Node.js & npm"] --> thisModule["Starter Module"] --> usedBy["Three.js Project"]
-  dependencies --> details["Installs dependencies"]
-  thisModule --> process["Dev server, Build tooling"] 
-  usedBy --> consumers["Developers & users accessing Three.js app"]
+  nodejs["Node.js & npm"] --> starterModule["Starter Module"] --> developer["Three.js Developer"]
+  nodejs --> dependenciesInstall["Dependency Installation"]
+  starterModule --> devServer["Development Server (localhost:8080)"] 
+  starterModule --> prodBuild["Production Build (dist/)"] 
+  developer --> usageWorkflow["Development/Build Workflow"]
 ```

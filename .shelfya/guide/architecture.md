@@ -1,48 +1,52 @@
-# Three.js Starter Architecture
+# Three.js Rendering Module
 
 ## Overview
-This module sets up a basic 3D rendering environment using Three.js within a web page. It provides the foundational integration required to display 3D scenes on a canvas, acting as the entry point for Three.js-powered experiences. The module’s purpose is to initialize a scene, camera, renderer, and a simple 3D object, allowing developers to build upon this structure for further 3D interactions and visualizations.
+The Three.js Rendering Module is responsible for initializing, composing, and displaying interactive 3D graphics within the browser. It creates a rendering context, sets up the scene with 3D objects, and renders them to the HTML canvas using the Three.js library. This module is fundamental for visualizing 3D models and handling all rendering processes in the application.
 
 ## Key Features
-- **Canvas Integration**: Binds Three.js rendering to an HTML canvas element, enabling 3D graphics within the web page.
-- **Scene Initialization**: Creates and configures a Three.js scene, forming the basis for all 3D content.
-- **Camera Setup**: Establishes a perspective camera to view objects in the scene, controlling the user's visual perspective.
-- **Renderer Configuration**: Instantiates the WebGL renderer, connects it to the canvas, and manages the rendering process.
-- **Object Creation**: Constructs a simple 3D mesh (a red cube) as a starting example, demonstrating object instantiation and scene composition.
+- **Scene Creation**: Initializes a Three.js scene, enabling the addition and management of 3D objects, lights, and cameras.
+- **Canvas Integration**: Binds rendering output to an HTML canvas element, allowing 3D graphics to be displayed seamlessly on the web page.
+- **Camera Setup**: Configures and positions a 3D perspective camera to determine the viewer’s point of view in the scene.
+- **Mesh Rendering**: Constructs basic 3D geometry (e.g., a cube) with customizable materials and adds them to the scene for rendering.
+- **One-Time Render**: Renders the scene from the camera’s point of view to the canvas without animation, suitable for static previews or simple scenes.
+- **Responsive Configuration**: Enables straightforward adjustment of scene and camera size through a dedicated configuration object.
 
 ## System Errors
-- **Canvas Not Found**: If the target canvas element with the class `.webgl` is missing from the HTML, rendering will not work.
-  - **Resolution**: Ensure `<canvas class="webgl"></canvas>` is present in your HTML body.
-- **WebGL Context Issues**: Browser or device does not support WebGL, resulting in rendering failures.
-  - **Resolution**: Use a modern browser and ensure that hardware acceleration is enabled.
-- **Incorrect Canvas Dimensions**: Visual artifacts or incorrect rendering sizes may appear if the renderer's size does not match the canvas/viewport.
-  - **Resolution**: Adjust the `renderer.setSize()` parameters to match your desired display dimensions.
+- **Canvas Not Found**: If the canvas with the expected CSS class is missing in the HTML, rendering will silently fail or throw a `TypeError`.  
+  *Resolution*: Ensure your HTML includes `<canvas class="webgl"></canvas>` before initializing the Three.js code.
+- **Three.js Import Failure**: If the Three.js library is not properly installed or cannot be imported, importing will throw a module error.  
+  *Resolution*: Confirm that Three.js is listed as a dependency and installed (e.g., via npm or included via CDN).
+- **Renderer Configuration Mismatch**: If the canvas size set in the renderer does not match the actual canvas or viewport, rendering may be misaligned or appear distorted.  
+  *Resolution*: Adjust the `sizes.width` and `sizes.height` configuration to match the intended display area.
 
 ## Usage Examples
 
 ```js
-// HTML: index.html snippet
-<canvas class="webgl"></canvas>
-
-// JavaScript: script.js simplified workflow
 import * as THREE from 'three'
+
+// Select existing HTML canvas
 const canvas = document.querySelector('canvas.webgl')
+
+// Create new Three.js scene
 const scene = new THREE.Scene()
 
-// Create a red cube
+// Add a red cube mesh
 const geometry = new THREE.BoxGeometry(1, 1, 1)
 const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
-// Set up camera
-const camera = new THREE.PerspectiveCamera(75, 800 / 600)
+// Define rendering size
+const sizes = { width: 800, height: 600 }
+
+// Setup camera
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
 camera.position.z = 3
 scene.add(camera)
 
-// Initialize renderer and display scene
+// Create renderer and render scene
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
-renderer.setSize(800, 600)
+renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 ```
 
@@ -50,8 +54,8 @@ renderer.render(scene, camera)
 
 ```mermaid
 flowchart LR
-  dependencies["HTML/CSS/Three.js Library"] --> thisModule["Three.js Starter Module"] --> usedBy["Web Application Frontend"]
-  dependencies --> details["[canvas element, module import, style integration]"]
-  thisModule --> process["[Scene Setup, Camera, Renderer, Object Creation]"] 
-  usedBy --> consumers["[End Users/Web Browsers]"]
+  dependencies["Three.js Library (npm/CDN)"] --> thisModule["Three.js Rendering Module"] --> usedBy["HTML Canvas (index.html)"]
+  dependencies --> details["<script.js>"]
+  thisModule --> process["Scene Composition & Rendering"] 
+  usedBy --> consumers["Web Browser/User Display"]
 ```

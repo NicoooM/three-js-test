@@ -1,67 +1,68 @@
-# Getting Started Module
+# Three.js Starter Project
 
 ## Overview
-The Getting Started module provides a ready-to-use development environment for prototyping and launching Three.js web projects. It integrates Vite as a local server and build tool, configures project structure, and establishes a boilerplate Three.js scene. This module enables developers to quickly start visualizing 3D graphics in the browser with minimal setup.
+The Three.js Starter Project module provides a ready-to-use development environment for rapidly building and previewing interactive 3D experiences using Three.js. It establishes a minimal, modern workflow with Vite, delivering the essentials for fast prototyping and learning with WebGL-powered 3D graphics in the browser. This module manages both development and production setups, enabling efficient integration and iteration for Three.js-based applications.
 
 ## Key Features
-- **Local Development Server**: Launches a Vite-powered development server for instant preview and hot-reloading at `localhost:8080`.
-- **Production Build System**: Uses Vite to bundle and optimize project files into the `dist/` directory for deployment.
-- **Three.js Scene Boilerplate**: Instantiates a cube scene in Three.js rendered onto a responsive HTML canvas.
-- **Simple Project Structure**: Organized with clear separation between configuration, assets, scripts, and output directories.
-- **Automated Dependency Management**: Handles npm-based installation and updates for critical libraries like `three` and `vite`.
+- **Interactive 3D Canvas Integration**: Bootstraps a browser-based Three.js scene and renders a 3D object (cube) to a `<canvas>` element, demonstrating a complete graphics pipeline from scene setup to rendering.
+- **Modern Development Workflow**: Utilizes Vite for fast local development with hot module replacement, and streamlined production builds.
+- **Template HTML & Asset Handling**: Includes template HTML with styled canvas setup for 3D rendering and modular asset management.
+- **Configurable Build Pipeline**: Out-of-the-box configuration for local server hosting (network accessible), automatic browser launch (outside sandboxes), sourcemaps, and clean production output.
 
 ## System Errors
-- **Port Already In Use**: If `localhost:8080` is occupied, the dev server may fail to start.  
-  **Resolution**: Stop the conflicting service or change the port in `vite.config.js`.
-- **Missing Dependencies**: Running `npm run dev` without `npm install` may result in `module not found` errors.  
-  **Resolution**: Always run `npm install` before starting or building the project.
-- **Canvas Not Displayed**: If the `<canvas class="webgl">` selector is missing or misnamed, rendering will not occur.  
-  **Resolution**: Ensure the HTML contains `<canvas class="webgl"></canvas>`.
+- **Port Already in Use**: If the default development server port (8080) is occupied, Vite will prompt an error.  
+  _Resolution_: Stop the conflicting process or change the port in `vite.config.js`.
+- **Missing Three.js Dependency**: Error when Three.js is not installed or not found.  
+  _Resolution_: Run `npm install` to ensure all dependencies are properly installed.
+- **Canvas Not Found**: If the canvas element selector fails (e.g., class name changed), no rendering will occur.  
+  _Resolution_: Ensure `<canvas class="webgl"></canvas>` exists in `index.html` and matches the query in `script.js`.
+- **Build Directory Permission Issues**: Errors writing to `dist/` if lacking permissions.  
+  _Resolution_: Check filesystem permissions, and ensure your user can write to the project directory.
 
 ## Usage Examples
-
 ```bash
-# 1. Install project dependencies (run once)
+# Install project dependencies (first time only)
 npm install
 
-# 2. Start the development server (for local previews)
+# Start the local development server (opens browser by default)
 npm run dev
 
-# 3. Build the project for production (output in /dist)
+# Build the project for production (outputs to `dist/` directory)
 npm run build
 ```
 
-```javascript
-// Main entry point (src/script.js)
-import * as THREE from 'three';
+```js
+// Example: Editing src/script.js to add a spinning animation
+import * as THREE from 'three'
 
-const canvas = document.querySelector('canvas.webgl');
-const scene = new THREE.Scene();
+const canvas = document.querySelector('canvas.webgl')
+const scene = new THREE.Scene()
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+const sizes = { width: 800, height: 600 }
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+camera.position.z = 3
+scene.add(camera)
 
-// Basic cube mesh
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+const renderer = new THREE.WebGLRenderer({ canvas: canvas })
+renderer.setSize(sizes.width, sizes.height)
 
-// Camera setup
-const camera = new THREE.PerspectiveCamera(75, 800 / 600);
-camera.position.z = 3;
-scene.add(camera);
-
-// Renderer initialization
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(800, 600);
-renderer.render(scene, camera);
+// Simple animation loop
+function animate() {
+    mesh.rotation.y += 0.01
+    renderer.render(scene, camera)
+    requestAnimationFrame(animate)
+}
+animate()
 ```
 
 ## System Integration
-
 ```mermaid
 flowchart LR
-  dependencies["Node.js, npm, Vite, Three.js"] --> thisModule["Getting Started Module"]
-  thisModule --> usedBy["Three.js Project Developer"]
-  dependencies --> details["[Handles package installation, configuration files]"]
-  thisModule --> process["[Launch dev server, build output, initialize Three.js scene]"]
-  usedBy --> consumers["[Views live 3D scene in browser, deploys built assets]"]
+  dependencies["Dependencies (Vite, Three.js, Node.js)"] --> thisModule["Three.js Starter Project Module"] --> usedBy["Used By"]
+  dependencies --> details["[Vite handles build and server; Three.js for rendering; Node.js for scripts]"]
+  thisModule --> process["[HTML template, JS with scene setup, Canvas for rendering]"] 
+  usedBy --> consumers["[Developers building 3D web apps or demos]"]
 ```

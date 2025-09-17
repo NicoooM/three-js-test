@@ -1,32 +1,32 @@
-# Starter FAQ
+# FAQ Module
 
 ## Overview
-The **Starter** module provides a streamlined setup and development workflow for Three.js-based projects. It helps developers quickly install dependencies, start a local development server, and build ready-to-deploy production bundles. This module ensures consistency and reduces setup friction for teams working with Three.js.
+The FAQ module provides essential information to help users quickly resolve common issues or questions related to setting up and using the Three.js starter project. Its primary purpose is to facilitate onboarding, clarify setup steps, and ensure smooth project initialization by assisting users with typical obstacles.
 
 ## Key Features
-- **Dependency Installation**: Automatically installs all necessary Node.js packages for the project environment.
-- **Local Development Server**: Easily launches a development server on `localhost:8080` for live testing and preview.
-- **Production Build**: Offers a one-command solution to build the project for production, outputting files to the `dist/` directory.
-- **Cross-Platform Workflow**: Designed to be compatible with major operating systems supporting Node.js.
+- **Project Setup Guidance**: Outlines necessary steps for installing dependencies, running the development server, and building the production bundle.
+- **Troubleshooting Assistance**: Offers clear solutions for common errors encountered during installation and usage.
+- **Quick Command Reference**: Provides easily accessible commands to streamline frequent project workflows.
 
 ## System Errors
-- **Dependency Installation Error**: Occurs when running `npm install` if dependencies are missing or there are network issues.
-  - **Resolution**: Ensure a stable internet connection and that Node.js/npm are installed and up to date. Re-run `npm install`.
-- **Server Startup Error**: When running `npm run dev`, the server may fail to start if the port is in use or dependencies are missing.
-  - **Resolution**: Check if another service is using port 8080 and stop it, or change the port. Ensure dependencies are installed.
-- **Build Error**: Errors during `npm run build` can be caused by misconfigured project files or incompatible modules.
-  - **Resolution**: Review console error messages, check configuration files (`package.json`, etc.), and resolve any code issues.
+- **Dependency Installation Failure**: Occurs if required packages are not installed.
+  - **Resolution**: Ensure you have run `npm install` in your project directory before running or building the project.
+- **Server Port Occupied**: The development server cannot start if port 8080 is in use.
+  - **Resolution**: Close any application using port 8080, or configure a different port in your project settings.
+- **Node.js Version Incompatibility**: Running outdated or unsupported versions of Node.js can cause errors.
+  - **Resolution**: Download and install the latest LTS version of Node.js from [nodejs.org](https://nodejs.org/en/download/).
 
 ## Usage Examples
+Practical code examples showing how to use the module:
 
 ```bash
-# 1. Install all project dependencies (run once):
+# Install dependencies (only needed once)
 npm install
 
-# 2. Start the development server at http://localhost:8080/
+# Start the local development server on localhost:8080
 npm run dev
 
-# 3. Build the project for production (output in 'dist/' folder):
+# Build the project for production (output in the dist/ directory)
 npm run build
 ```
 
@@ -34,9 +34,8 @@ npm run build
 
 ```mermaid
 flowchart LR
-  nodejs["Node.js & npm"] --> starterModule["Starter Module"] --> developer["Three.js Developer"]
-  nodejs --> dependenciesInstall["Dependency Installation"]
-  starterModule --> devServer["Development Server (localhost:8080)"] 
-  starterModule --> prodBuild["Production Build (dist/)"] 
-  developer --> usageWorkflow["Development/Build Workflow"]
+  dependencies["Node.js, npm"] --> thisModule["FAQ Module"] --> usedBy["Developers, End Users"]
+  dependencies --> details["[Setup Instructions]"]
+  thisModule --> process["[Project Initialization, Troubleshooting]"]
+  usedBy --> consumers["[Streamlined Development, Faster Onboarding]"]
 ```

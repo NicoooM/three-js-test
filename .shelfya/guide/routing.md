@@ -1,57 +1,55 @@
-# Routing Configuration
+# Routing and Build Output Configuration
 
 ## Overview
-This module defines the routing and server configuration for the Vite development and build system used in the project. It specifies how project files are served, where output is generated, and how the local development server behaves. This setup ensures that your application is correctly routed in both development and production environments.
+This module configures the root directory, public assets location, server options, and build output paths for the Vite-based frontend environment. It ensures that development and production builds serve the correct files from appropriate locations—crucial for accurate routing, static asset resolution, and seamless local/network preview.
 
 ## Key Features
-- **Custom Root Directory**: The module sets `src/` as the root directory, ensuring Vite serves and resolves modules from your source code location.
-- **Public Assets Handling**: Static assets are sourced from `static/` and made available in your build, supporting efficient asset management.
-- **Configurable Base Path**: Uses a relative base path (`./`), which is important when deploying applications to subfolders or static hosts.
-- **Adaptive Server Opening**: Automatically opens the browser in development—unless running in a cloud or sandboxed environment—improving developer experience.
-- **Network Accessibility**: Server is accessible on your local network, simplifying testing across devices.
-- **Output Directory Management**: Outputs built files to `dist/`, empties the directory before building, and includes source maps for debugging.
+- **Root Source Directory**: Sets the source entry point for the Vite server, determining how routes resolve during development and build.
+- **Custom Public Directory**: Specifies a public assets directory, so static content is served at the root during both development and production.
+- **Base Path Configuration**: Defines the base URL for serving assets, ensuring relative asset loading when deployed in subfolders.
+- **Network-Accessible Dev Server**: Configures the server to allow LAN access, facilitating device/browser testing.
+- **Conditional Browser Opening**: Automatically opens the site in the default browser on server start, except within hosting sandboxes (like CodeSandbox).
+- **Build Output Location**: Explicitly sets the output directory, aiding in deployment and asset management.
+- **Clean Builds with Source Maps**: Ensures output directory is cleaned before building and source maps are generated for debugging.
 
 ## System Errors
-- **Server Not Accessible**: If the server isn't accessible on the local network, ensure that your firewall settings permit connections and that `host: true` is set correctly.
-- **Asset Loading Issues**: Misplaced assets or incorrect `publicDir` settings may cause missing files in production. Verify assets are located in `static/` and referenced with the correct paths.
-- **Incorrect Deployment Routing**: If deploying to a subdirectory and routes break, double-check the `base` option is set appropriately relative to your deployment URL.
-- **Build Output Missing**: If the `dist/` directory does not populate, confirm that the `outDir` is correctly referenced and you have write permissions.
+- **Incorrect Asset Paths**: If `base` is misconfigured, assets may not load properly, especially when deploying to subfolders.  
+  *Resolution*: Confirm `base` matches your deployment target path.
+- **Public Asset Not Found**: If files placed in the wrong directory (`static/` vs. `public/`), they won't be served.  
+  *Resolution*: Place all static, root-served files in the specified `../static/` directory.
+- **LAN Access Fails**: If the `server.host` property is not set to `true`, devices on the local network can't access the dev server.  
+  *Resolution*: Ensure `host: true` in the server configuration.
 
 ## Usage Examples
 
 ```js
-// vite.config.js
+// vite.config.js - custom routing and asset base for a subfolder deployment
+
 export default {
-    root: 'src/',
-    publicDir: '../static/',
-    base: './',
+    root: 'src/',                 // Entrypoint for the app
+    publicDir: '../static/',      // Static files directory
+    base: '/my-app/',             // Assets served from /my-app/ path
     server: {
-        host: true,
-        open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env)
+        host: true,               // Accessible from local network
+        open: true                // Opens browser automatically
     },
     build: {
-        outDir: '../dist',
-        emptyOutDir: true,
-        sourcemap: true
-    },
+        outDir: '../dist',        // Output in dist/
+        emptyOutDir: true,        // Clean before building
+        sourcemap: true           // Enable source maps
+    }
 }
 
-// Command line (development):
-// Run Vite and serve the application using this configuration
-// npx vite
-
-// Command line (production build):
-// Build the optimized application artifacts
-// npx vite build
+// Place 'logo.png' in static/ (resolved at '/logo.png' in the browser)
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  fileSys["Static Assets /publicDir"] --> routingConfig["Routing Configuration Module"] --> viteServer["Vite Dev Server"]
-  viteServer --> browser["Browser/Local Network Clients"]
-  routingConfig --> buildProcess["Vite Build Process"]
-  buildProcess --> outputDir["dist/ (Build Output)"]
-  outputDir --> deployEnv["Static Host / Deployment Environment"]
+  vite["Vite Build System"] --> config["Routing & Build Output Module"] --> dist["Production Output"]
+  config --> devServer["Development Server"]
+  config --> routing["Route Resolver"]
+  dist --> deployment["Static Hosting/Deployment"]
+  devServer --> browser["Browser/Consumers"]
 ```

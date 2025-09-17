@@ -1,50 +1,58 @@
-# Three.js Rendering Module
+# Three.js Scene Bootstrapper
 
 ## Overview
-The Three.js Rendering Module is responsible for initializing, composing, and displaying interactive 3D graphics within the browser. It creates a rendering context, sets up the scene with 3D objects, and renders them to the HTML canvas using the Three.js library. This module is fundamental for visualizing 3D models and handling all rendering processes in the application.
+This module bootstraps a basic 3D scene using Three.js. It sets up the essential rendering pipeline, including canvas creation, a rendering context, basic geometric objects, and a camera, allowing any web page to quickly display and experiment with 3D graphics. This serves as the entry point and foundation for more complex Three.js applications.
 
 ## Key Features
-- **Scene Creation**: Initializes a Three.js scene, enabling the addition and management of 3D objects, lights, and cameras.
-- **Canvas Integration**: Binds rendering output to an HTML canvas element, allowing 3D graphics to be displayed seamlessly on the web page.
-- **Camera Setup**: Configures and positions a 3D perspective camera to determine the viewer’s point of view in the scene.
-- **Mesh Rendering**: Constructs basic 3D geometry (e.g., a cube) with customizable materials and adds them to the scene for rendering.
-- **One-Time Render**: Renders the scene from the camera’s point of view to the canvas without animation, suitable for static previews or simple scenes.
-- **Responsive Configuration**: Enables straightforward adjustment of scene and camera size through a dedicated configuration object.
+
+- **Canvas Initialization**: Selects and manages the `<canvas>` HTML element dedicated to 3D rendering.
+- **Scene and Object Setup**: Creates a Three.js scene and adds a sample 3D box mesh to demonstrate rendering capabilities.
+- **Camera Configuration**: Establishes a perspective camera positioned appropriately to view objects in the scene.
+- **Renderer Initialization**: Sets up the WebGL renderer, attaches it to the selected canvas, and matches dimensional settings.
+- **Single-Frame Rendering Pipeline**: Renders the current scene with the configured camera for immediate visualization.
+- **Vite Integration**: Uses a Vite configuration optimized for rapid development and hot-reloading within the appropriate source/public directories.
 
 ## System Errors
-- **Canvas Not Found**: If the canvas with the expected CSS class is missing in the HTML, rendering will silently fail or throw a `TypeError`.  
-  *Resolution*: Ensure your HTML includes `<canvas class="webgl"></canvas>` before initializing the Three.js code.
-- **Three.js Import Failure**: If the Three.js library is not properly installed or cannot be imported, importing will throw a module error.  
-  *Resolution*: Confirm that Three.js is listed as a dependency and installed (e.g., via npm or included via CDN).
-- **Renderer Configuration Mismatch**: If the canvas size set in the renderer does not match the actual canvas or viewport, rendering may be misaligned or appear distorted.  
-  *Resolution*: Adjust the `sizes.width` and `sizes.height` configuration to match the intended display area.
+
+- **Canvas Not Found**: If the `<canvas class="webgl">` element is missing from the HTML, the Three.js renderer will fail to initialize.  
+  *Resolution:* Ensure `<canvas class="webgl"></canvas>` exists in the HTML body.
+
+- **Three.js Import Failure**: If Three.js fails to import, rendering and scene assembly will not function.  
+  *Resolution:* Validate that Three.js is correctly installed and accessible in your project dependencies.
+
+- **WebGL Context Unavailable**: On browsers or devices without WebGL support, rendering will fail.  
+  *Resolution:* Use feature detection and recommend running on up-to-date browsers with WebGL enabled.
+
+- **Size Mismatch**: If the canvas CSS or JavaScript sizing is misaligned, rendering artefacts or improper scaling may occur.  
+  *Resolution:* Ensure the renderer, canvas, and CSS settings agree on width and height.
 
 ## Usage Examples
 
 ```js
+// Importing and running the module (script.js must be loaded as ES module in index.html)
 import * as THREE from 'three'
 
-// Select existing HTML canvas
+// Obtain the canvas
 const canvas = document.querySelector('canvas.webgl')
 
-// Create new Three.js scene
+// Setup the Three.js scene
 const scene = new THREE.Scene()
 
-// Add a red cube mesh
+// Create a red cube mesh and add to the scene
 const geometry = new THREE.BoxGeometry(1, 1, 1)
 const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
-// Define rendering size
+// Define render sizing
 const sizes = { width: 800, height: 600 }
 
-// Setup camera
+// Configure the camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
 camera.position.z = 3
 scene.add(camera)
 
-// Create renderer and render scene
+// Initialize renderer and output the scene
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
@@ -54,8 +62,10 @@ renderer.render(scene, camera)
 
 ```mermaid
 flowchart LR
-  dependencies["Three.js Library (npm/CDN)"] --> thisModule["Three.js Rendering Module"] --> usedBy["HTML Canvas (index.html)"]
-  dependencies --> details["<script.js>"]
-  thisModule --> process["Scene Composition & Rendering"] 
-  usedBy --> consumers["Web Browser/User Display"]
+  threejs["Three.js Library (npm/yarn)"] --> bootstrapper["Three.js Scene Bootstrapper"]
+  vitecfg["Vite Dev Server Config"] --> bootstrapper
+  indexhtml["index.html Canvas & Script"] --> bootstrapper
+  bootstrapper --> renderproc["Renders 3D Scene on webgl Canvas"]
+  bootstrapper --> devreload["Supports Vite Dev/Hot Reload"]
+  renderproc --> userbrowser["Browser User/Developer"]
 ```

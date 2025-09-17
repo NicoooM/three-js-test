@@ -1,58 +1,47 @@
-# Three.js Scene Bootstrap Architecture
+# Three.js Starter Architecture
 
 ## Overview
-This module provides a foundational 3D scene setup using [Three.js](https://threejs.org/), suitable for web-based visualizations and rapid prototyping. It bootstraps a WebGL 3D environment, renders a basic object, and establishes the core building blocks—Canvas, Scene, Camera, and Renderer. The structure enables developers to quickly build, expand, or integrate more complex 3D features within modern frontend workflows powered by Vite.
+This module sets up a basic 3D rendering environment using Three.js within a web page. It provides the foundational integration required to display 3D scenes on a canvas, acting as the entry point for Three.js-powered experiences. The module’s purpose is to initialize a scene, camera, renderer, and a simple 3D object, allowing developers to build upon this structure for further 3D interactions and visualizations.
 
 ## Key Features
-
-- **WebGL Canvas Integration**: Initializes a dedicated HTML `<canvas>` and binds it to Three.js, offering a rendering surface for 3D content.
-- **Scene Setup**: Establishes a new Three.js scene instance, serving as a container for 3D objects, lighting, and helpers.
-- **Object Initialization**: Adds a basic 3D object—a red cube—demonstrating object management within the scene.
-- **Camera Configuration**: Positions a perspective camera to provide a viewpoint for rendering, essential for 3D navigation and interaction.
-- **Renderer Management**: Dynamically ties the Three.js renderer to the canvas, handles sizing, and triggers the initial render pass.
-- **Vite Integration**: Optimized project structure for use with Vite, supporting fast local development, hot reloads, and custom build outputs.
+- **Canvas Integration**: Binds Three.js rendering to an HTML canvas element, enabling 3D graphics within the web page.
+- **Scene Initialization**: Creates and configures a Three.js scene, forming the basis for all 3D content.
+- **Camera Setup**: Establishes a perspective camera to view objects in the scene, controlling the user's visual perspective.
+- **Renderer Configuration**: Instantiates the WebGL renderer, connects it to the canvas, and manages the rendering process.
+- **Object Creation**: Constructs a simple 3D mesh (a red cube) as a starting example, demonstrating object instantiation and scene composition.
 
 ## System Errors
-
-- **Missing Canvas Element**:  
-  *Description*: The canvas element with the class `webgl` is not found within the HTML document.  
-  *Resolution*: Ensure `<canvas class="webgl"></canvas>` exists in your HTML file.
-
-- **WebGL Context Loss / Renderer Failure**:  
-  *Description*: The renderer cannot initialize (typically due to browser/WebGL support issues).  
-  *Resolution*:  
-    - Confirm browser compatibility with WebGL.  
-    - Check browser console for security errors related to cross-origin or file serving.  
-    - Ensure the `renderer` is constructed after DOMContentLoaded.
+- **Canvas Not Found**: If the target canvas element with the class `.webgl` is missing from the HTML, rendering will not work.
+  - **Resolution**: Ensure `<canvas class="webgl"></canvas>` is present in your HTML body.
+- **WebGL Context Issues**: Browser or device does not support WebGL, resulting in rendering failures.
+  - **Resolution**: Use a modern browser and ensure that hardware acceleration is enabled.
+- **Incorrect Canvas Dimensions**: Visual artifacts or incorrect rendering sizes may appear if the renderer's size does not match the canvas/viewport.
+  - **Resolution**: Adjust the `renderer.setSize()` parameters to match your desired display dimensions.
 
 ## Usage Examples
 
 ```js
-// 1. Ensure your HTML contains:
+// HTML: index.html snippet
 <canvas class="webgl"></canvas>
 
-// 2. Example: Basic Three.js Scene Creation (script.js)
+// JavaScript: script.js simplified workflow
 import * as THREE from 'three'
-
-// Select canvas
 const canvas = document.querySelector('canvas.webgl')
-
-// Create scene
 const scene = new THREE.Scene()
 
-// Create a red cube and add to scene
+// Create a red cube
 const geometry = new THREE.BoxGeometry(1, 1, 1)
 const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
-// Camera setup
+// Set up camera
 const camera = new THREE.PerspectiveCamera(75, 800 / 600)
 camera.position.z = 3
 scene.add(camera)
 
-// Renderer setup and first render
-const renderer = new THREE.WebGLRenderer({ canvas })
+// Initialize renderer and display scene
+const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.setSize(800, 600)
 renderer.render(scene, camera)
 ```
@@ -61,14 +50,8 @@ renderer.render(scene, camera)
 
 ```mermaid
 flowchart LR
-  html[("index.html: Canvas & Script Element")] --> threejsModule["Three.js Scene Bootstrap Module"]
-  vite["Vite Dev Server (vite.config.js)"] --> threejsModule
-  threejsModule --> browserRenderer["WebGL-capable Browser"]
-  threejsModule --> threeObjects["Three.js Scene & Objects"]
-  browserRenderer --> userDisplay["User's Screen"]
-  threeObjects --> featureExpansion["Further 3D Features/Modules"]
+  dependencies["HTML/CSS/Three.js Library"] --> thisModule["Three.js Starter Module"] --> usedBy["Web Application Frontend"]
+  dependencies --> details["[canvas element, module import, style integration]"]
+  thisModule --> process["[Scene Setup, Camera, Renderer, Object Creation]"] 
+  usedBy --> consumers["[End Users/Web Browsers]"]
 ```
-
-- **Dependencies**: HTML structure (`<canvas class="webgl">`), Three.js library, and the Vite dev/build system.
-- **This Module**: Initializes the Three.js scene within the canvas, sets up the basic camera, scene, object, and renderer relationships.
-- **Used By**: Any system or developer requiring a 3D rendering base for web projects; can be extended by further 3D graphics features or plugins.

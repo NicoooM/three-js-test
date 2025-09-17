@@ -1,52 +1,49 @@
-# Getting Started
+# Getting Started with the Three.js Starter Project
 
 ## Overview
-The Getting Started module provides an entry point for setting up, developing, and building the Three.js Journey Starter environment. It prepares the project workspace with all necessary dependencies, serves content locally, and builds production-ready assets. This module is essential for initializing new workspace instances and facilitating a streamlined development experience.
+This starter module provides a ready-to-use environment for Three.js development using Vite as the build tool. It enables rapid setup and launching of 3D graphics applications that render directly into an HTML canvas. The project is structured for ease-of-use, supporting both development and production builds, and uses modern frontend tooling and workflows.
 
 ## Key Features
-
-- **Dependency Management**: Automates the installation of Node.js dependencies using npm to ensure all required packages are available.
-- **Development Server Initialization**: Launches a local server (powered by Vite) that serves the project at `localhost:8080`, enabling live development and preview in the browser.
-- **Production Build Output**: Compiles and optimizes source files, placing the final assets in the `dist/` directory for deployment.
-- **Static Assets Handling**: Serves and includes static assets from the dedicated `static/` folder, keeping public resources organized.
-- **Network Accessibility**: Configures the development server to be accessible from the local network, supporting collaborative development and device testing.
-- **Environment-specific Behavior**: Adapts server behavior for online sandboxes (like CodeSandbox) by disabling automatic browser opening in those contexts.
+- **Vite Development Server**: Instantly runs a fast local server at `localhost:8080` for iterative development, complete with live reload and network access.
+- **Three.js Integration**: Includes the full Three.js library for building advanced WebGL scenes and 3D content.
+- **Production Build Pipeline**: One-command build outputs fully bundled and optimized assets to the `/dist` directory, ready for deployment.
+- **Project Structure & Index Template**: Organized folder structure (`src/`, `static/`, `dist/`) and pre-wired HTML (`index.html`) with Three.js canvas and script loading.
 
 ## System Errors
-
-- **Missing Dependencies**: If `npm install` has not been run, development or build scripts may fail with `Cannot find module` errors.  
-  **Resolution**: Run `npm install` in the project root before starting development.
-- **Port Conflict**: If port 8080 is already in use, the development server may fail to start.  
-  **Resolution**: Close the application using the port or modify the port in `vite.config.js`.
-- **Node.js Not Installed**: If Node.js is missing, npm commands will fail.  
-  **Resolution**: [Install Node.js](https://nodejs.org/en/download/) before proceeding.
-- **Permission Issues**: Build or install commands may fail due to insufficient permissions (e.g., `EACCES`).  
-  **Resolution**: Ensure you have appropriate permissions, or run commands as an administrator.
+- **Port Conflict Error**: If port 8080 is already in use, starting the dev server will fail (e.g., "EADDRINUSE").  
+  *Resolution*: Stop the conflicting process or change the port in `vite.config.js`.
+- **Dependency Missing Error**: If dependencies are not installed, commands will fail with errors about missing packages.  
+  *Resolution*: Run `npm install` before starting the server or building.
+- **Build Output Error**: If the `dist/` directory isn't created as expected (permissions or misconfiguration).  
+  *Resolution*: Ensure you have write permissions to the parent directory and the build configuration remains unaltered.
 
 ## Usage Examples
 
 ```bash
-# 1. Install all project dependencies (run first time)
+# Step 1: Install project dependencies (run once)
 npm install
 
-# 2. Start the development server and open the app at localhost:8080
+# Step 2: Start local development server (live reload at http://localhost:8080)
 npm run dev
 
-# 3. Build the project for production (output goes to 'dist/' directory)
+# Step 3: Build production assets into the 'dist/' directory
 npm run build
+```
+
+```html
+<!-- Example: Rendering Three.js in your app (src/index.html) -->
+<canvas class="webgl"></canvas>
+<script type="module" src="./script.js"></script>
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  devEnv["Node.js/NPM"] --> starter["Getting Started Module"] --> devServer["Vite Development Server"]
-  devEnv --> dependencies["Project Dependencies"]
-  starter --> buildProcess["Production Build (Vite)"]
-  buildProcess --> output["dist/ (Production Assets)"]
-  devServer --> browser["Web Browser"]
-  dependencies --> three["Three.js (3D Engine)"]
-  devServer --> static["Static Assets"]
-  static --> browser
-  three --> browser
+  dependencies["Node.js, Vite, Three.js NPM Packages"] --> thisModule["Three.js Starter Project"]
+  thisModule --> usedBy["App Developers / Web Browsers"]
+
+  dependencies --> details["[Provides Build Tools, Library APIs, and Module Loader]"]
+  thisModule --> process["[Configures Vite, Loads Three.js, and Renders to Canvas]"]
+  usedBy --> consumers["[Serves Built Site, Enables 3D Web App Development]"]
 ```

@@ -1,36 +1,36 @@
-# FAQ
+# Starter FAQ
 
 ## Overview
-This module provides answers to the most common questions encountered when setting up and using the Three.js Journey starter project. It helps developers quickly resolve setup, build, and runtime issues related to the development workflow.
+The **Starter** module serves as the foundational toolkit for initializing, running, and building a Three.js project. It streamlines the setup process, allowing developers to quickly get started with a local development environment, manage dependencies, and prepare production-ready builds. This module acts as the entry point for anyone beginning a Three.js journey in this repository.
 
 ## Key Features
-- **Environment Setup Guidance**: Clarifies requirements like Node.js installation and initial project setup.
-- **Development Workflow Assistance**: Explains how to run the local development server and build the project for production.
-- **Troubleshooting Support**: Offers solutions to frequent errors and common pitfalls during installation, development, and build processes.
+- **Dependency Management**: Installs all required libraries and modules for the project with a single command.
+- **Development Server**: Launches a local server (default: `localhost:8080`) for real-time project development and testing.
+- **Production Build Tooling**: Compiles and bundles source files into optimized assets within the `dist/` directory for deployment.
 
 ## System Errors
-- **Missing Dependencies**:  
-  *Description*: Error when running scripts due to uninstalled npm packages (e.g., "module not found").  
-  *Resolution*: Run `npm install` in the project directory to fetch and install all required dependencies.
+- **Missing Node.js**:  
+  *Description*: The environment lacks Node.js, preventing any npm commands from running.  
+  *Resolution*: Download and install the latest version of Node.js from [nodejs.org](https://nodejs.org/en/download/).
 
-- **Build or Dev Server Fails to Start**:  
-  *Description*: Errors like "command not found" or port 8080 in use prevent the app from running.  
-  *Resolution*: Ensure Node.js is installed and the correct directory is used. If port 8080 is busy, stop other processes or change the port configuration.
+- **Dependency Installation Failure**:  
+  *Description*: Errors occur during `npm install`, often due to missing internet connection or permission issues.  
+  *Resolution*: Check your network connection, ensure correct permissions, and, if relevant, try running with `sudo` on Unix-based systems.
 
-- **Production Build Issues**:  
-  *Description*: Errors or missing files in the `dist/` directory after running `npm run build`.  
-  *Resolution*: Check for prior build errors in the terminal and resolve dependency/version conflicts; delete `dist/` and retry building.
+- **Port Conflict (8080 in use)**:  
+  *Description*: The development server fails to start because port 8080 is already occupied.  
+  *Resolution*: Close the application using that port or modify the configuration to use a different port.
 
 ## Usage Examples
 
 ```bash
-# First-time setup: install dependencies
+# Step 1: Install all project dependencies (only needed once)
 npm install
 
-# Start local development server (opens app at http://localhost:8080)
+# Step 2: Start the local development server
 npm run dev
 
-# Create a production build in the dist/ directory
+# Step 3: Build the project for production deployment
 npm run build
 ```
 
@@ -38,8 +38,8 @@ npm run build
 
 ```mermaid
 flowchart LR
-  dependencies["Node.js, npm"] --> faq["FAQ Module"] --> usedBy["Developers"]
-  dependencies --> details["Explains Setup Requirements"]
-  faq --> process["Resolves Common Errors / Workflow"] 
-  usedBy --> consumers["Supports Project Initialization and Troubleshooting"]
+  dependencies["Node.js & npm"] --> thisModule["Starter Module"] --> usedBy["Three.js Project"]
+  dependencies --> details["Installs dependencies"]
+  thisModule --> process["Dev server, Build tooling"] 
+  usedBy --> consumers["Developers & users accessing Three.js app"]
 ```

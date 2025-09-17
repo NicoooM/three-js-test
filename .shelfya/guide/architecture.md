@@ -1,71 +1,51 @@
-# Three.js Scene Bootstrapper
+# Architecture Overview
 
 ## Overview
-This module bootstraps a basic 3D scene using Three.js. It sets up the essential rendering pipeline, including canvas creation, a rendering context, basic geometric objects, and a camera, allowing any web page to quickly display and experiment with 3D graphics. This serves as the entry point and foundation for more complex Three.js applications.
+This project’s architecture is a modular collection of Three.js learning “exercises,” each organized in a separate folder. Each module (like 3D Text, Animation, Camera, etc.) is built and operated independently using Vite, but they share a common setup, deployment structure, and global dependencies (notably Three.js). The architecture enables developers to work on or deploy features in isolation, while maintaining a unified developer experience and build process.
 
 ## Key Features
-
-- **Canvas Initialization**: Selects and manages the `<canvas>` HTML element dedicated to 3D rendering.
-- **Scene and Object Setup**: Creates a Three.js scene and adds a sample 3D box mesh to demonstrate rendering capabilities.
-- **Camera Configuration**: Establishes a perspective camera positioned appropriately to view objects in the scene.
-- **Renderer Initialization**: Sets up the WebGL renderer, attaches it to the selected canvas, and matches dimensional settings.
-- **Single-Frame Rendering Pipeline**: Renders the current scene with the configured camera for immediate visualization.
-- **Vite Integration**: Uses a Vite configuration optimized for rapid development and hot-reloading within the appropriate source/public directories.
+- **Modular Feature Structure**: Each main Three.js lesson (e.g., Geometries, Materials, Lights) is self-contained in its own folder with its own source code, assets, and Vite configuration.
+- **Standardized Build System**: Every module uses Vite for local development, optimized builds, and serving assets. Configurations are highly consistent across all modules.
+- **Shared Public Directory**: Assets are served from a root-level `static/` directory to ensure resources are consistently available across modules.
+- **Unified Dependency Management**: A single root `package.json` manages dependencies (notably Three.js and Vite), ensuring all modules use the same library versions and can share a node_modules folder.
+- **Consistent Developer Workflow**: Common NPM scripts (`npm run dev`, `npm run build`) provide a predictable lifecycle for starting, building, and serving each module.
+- **Isolated Output**: All build artifacts are output into individual `dist/` folders per module, to avoid conflicts and allow direct deployment/testing of any feature.
 
 ## System Errors
-
-- **Canvas Not Found**: If the `<canvas class="webgl">` element is missing from the HTML, the Three.js renderer will fail to initialize.  
-  *Resolution:* Ensure `<canvas class="webgl"></canvas>` exists in the HTML body.
-
-- **Three.js Import Failure**: If Three.js fails to import, rendering and scene assembly will not function.  
-  *Resolution:* Validate that Three.js is correctly installed and accessible in your project dependencies.
-
-- **WebGL Context Unavailable**: On browsers or devices without WebGL support, rendering will fail.  
-  *Resolution:* Use feature detection and recommend running on up-to-date browsers with WebGL enabled.
-
-- **Size Mismatch**: If the canvas CSS or JavaScript sizing is misaligned, rendering artefacts or improper scaling may occur.  
-  *Resolution:* Ensure the renderer, canvas, and CSS settings agree on width and height.
+- **Port In Use Error**: Trying to run multiple modules (`npm run dev`) at the same time may cause port conflicts (default is 8080).
+  - **Resolution**: Only run one dev server at a time, or specify a different port in the Vite config.
+- **Shared Static Asset Conflicts**: Modifying or overwriting files in the global `static/` directory can cause unexpected behavior across modules.
+  - **Resolution**: Use unique filenames and coordinate changes to shared assets.
+- **Dependency Version Mismatch**: If a module requires a version of Three.js or Vite not matching `package.json`, builds or runtime may fail.
+  - **Resolution**: Always install/update dependencies at the root with `npm install` to maintain consistency.
 
 ## Usage Examples
 
-```js
-// Importing and running the module (script.js must be loaded as ES module in index.html)
-import * as THREE from 'three'
+```bash
+# Install dependencies for all modules
+npm install
 
-// Obtain the canvas
-const canvas = document.querySelector('canvas.webgl')
+# Start developing in the "Geometries" module
+cd Geometries
+npm run dev
 
-// Setup the Three.js scene
-const scene = new THREE.Scene()
+# Build the "Lights" module for production
+cd ../Lights
+npm run build
 
-// Create a red cube mesh and add to the scene
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
-
-// Define render sizing
-const sizes = { width: 800, height: 600 }
-
-// Configure the camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-camera.position.z = 3
-scene.add(camera)
-
-// Initialize renderer and output the scene
-const renderer = new THREE.WebGLRenderer({ canvas: canvas })
-renderer.setSize(sizes.width, sizes.height)
-renderer.render(scene, camera)
+# Serve a built module (after build, using a simple static server)
+npx serve dist
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  threejs["Three.js Library (npm/yarn)"] --> bootstrapper["Three.js Scene Bootstrapper"]
-  vitecfg["Vite Dev Server Config"] --> bootstrapper
-  indexhtml["index.html Canvas & Script"] --> bootstrapper
-  bootstrapper --> renderproc["Renders 3D Scene on webgl Canvas"]
-  bootstrapper --> devreload["Supports Vite Dev/Hot Reload"]
-  renderproc --> userbrowser["Browser User/Developer"]
+  dependencies["Node.js<br>Three.js<br>Vite<br>root package.json"] --> thisModule["Modular Folder (e.g., Geometries, Lights, etc.)"]
+  dependencies --> details["[Installs dependencies via npm]"]
+  thisModule --> process["[Build/Dev Server (Vite per module)]"]
+  usedBy["Local Developer<br>Deployer<br>Learner"] --> thisModule
+  process --> consumers["Browser-based Demo/Feature"]
 ```
+
+This modular architecture enables developers to learn, test, and deploy Three.js features in an isolated, maintainable, and reproducible manner, while sharing core tooling across all modules.

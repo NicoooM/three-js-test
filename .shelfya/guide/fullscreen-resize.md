@@ -1,65 +1,94 @@
-# FullScreen Resize Module
+# Fullscreen & Resize Module
 
 ## Overview
-The FullScreen Resize module enables Three.js scenes to seamlessly respond to browser window resizing and fullscreen mode changes. It ensures the 3D canvas always fills the viewport, updating rendering and camera configurations dynamically. This provides a smooth user experience across devices and display sizes.
+The Fullscreen & Resize module enables seamless resizing of the rendering canvas and toggling fullscreen mode within a Three.js application. This feature ensures that the 3D scene dynamically adapts to browser window size changes and gives users an immersive fullscreen experience triggered via double-click. It is essential for creating interactive, visually consistent, and responsive 3D web applications.
 
 ## Key Features
-
-- **Dynamic Canvas Resizing**: Automatically adjusts the canvas, renderer, and camera settings when the browser window size changes, keeping the scene proportional and responsive.
-- **Fullscreen Toggle Support**: Allows users to enter and exit fullscreen mode via double-clicking the canvas, with cross-browser compatibility.
-- **Automatic Pixel Ratio Adjustment**: Sets the renderer’s pixel ratio based on device capabilities for optimal visual fidelity and performance.
-- **Orbit Controls Integration**: Enables intuitive user interaction with the 3D scene, supporting panning, zooming, and rotation with damping enabled.
+- **Dynamic Canvas Resizing**: Automatically adjusts the Three.js renderer, camera aspect ratio, and rendering size in response to browser window size changes. Maintains correct proportions and responsiveness.
+- **Fullscreen Mode Toggle**: Enables and exits browser-native fullscreen for the 3D canvas on double-click. Ensures compatibility across most modern browsers.
+- **User Interaction Integration**: Combines OrbitControls for interactive camera movement with responsive rendering, maintaining usability regardless of window state.
 
 ## System Errors
-
-- **Rendering Distortion After Resize**: Canvas or camera not updating after a window resize.
-  - **Resolution**: Ensure the resize event handler updates both camera aspect and renderer size.
-- **Fullscreen Not Working on Some Browsers**: Double-click does not enter fullscreen.
-  - **Resolution**: Confirm browser supports the required fullscreen API or its webkit-prefixed variant; triggers may be blocked if used outside user interaction.
-- **High Pixel Ratio Performance Issues**: Performance drops on high-DPI screens.
-  - **Resolution**: Renderer pixel ratio is clamped to avoid excessive GPU load; check the pixel ratio logic.
+- **Incorrect Canvas Size after Window Resize**: Occurs if renderer or camera is not updated on window resize.
+  - **Resolution**: Ensure event listeners for `resize` are active and both renderer size and camera aspect are updated.
+- **Fullscreen API Incompatibility**: Some browsers use prefixed methods (e.g., `webkitRequestFullscreen`), leading to fullscreen not working on certain platforms.
+  - **Resolution**: Use fallbacks for vendor-prefixed fullscreen methods as demonstrated in the module.
+- **Performance Drop at High DPI**: If `setPixelRatio` is too high, performance may degrade on devices with very high devicePixelRatio.
+  - **Resolution**: Clamp pixel ratio with `Math.min(window.devicePixelRatio, 2)` to balance quality and performance.
 
 ## Usage Examples
 
 ```js
-// Initialize the Three.js canvas using this module
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+// Add the following to your Three.js project
 
-const canvas = document.querySelector('canvas.webgl');
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.z = 3;
-scene.add(camera);
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
+const canvas = document.querySelector('canvas.webgl')
+const scene = new THREE.Scene()
 
-// Enable user interaction
-const controls = new OrbitControls(camera, canvas);
+// ...add objects to the scene...
+
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+camera.position.z = 3
+scene.add(camera)
+
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+
+const renderer = new THREE.WebGLRenderer({ canvas: canvas })
+renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
 
 window.addEventListener('dblclick', () => {
     if (!document.fullscreenElement) {
-        canvas.requestFullscreen?.() || canvas.webkitRequestFullscreen?.();
+        canvas.requestFullscreen?.() || canvas.webkitRequestFullscreen?.()
     } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        document.exitFullscreen?.() || document.webkitExitFullscreen?.()
     }
-});
+})
+
+// Standard render/animation loop
+function animate() {
+    controls.update()
+    renderer.render(scene, camera)
+    requestAnimationFrame(animate)
+}
+
+animate()
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  dependencies["Three.js, OrbitControls, Browser APIs (Fullscreen, Resize)"] --> thisModule["FullScreen Resize Module"] --> usedBy["3D Scene UI and User Interaction"]
-  dependencies --> details["[Three.js manages rendering, OrbitControls handles camera movements]"]
-  thisModule --> process["[Handles window resize and fullscreen events, updates renderer and camera]"] 
-  usedBy --> consumers["[End Users interacting with 3D content in the browser]"]
+  userInput["User Input (Resize, DoubleClick)"] --> fullscreenResize["Fullscreen & Resize Module"] --> threejsRenderer["Three.js Renderer"]
+  fullscreenResize --> camera["Perspective Camera"]
+  fullscreenResize --> controls["OrbitControls"]
+  threejsRenderer --> webglCanvas["WebGL Canvas"]
+  camera --> threejsRenderer
+  controls --> camera
+  webglCanvas --> browser["Browser (Window/Document)"]
 ```
+- **Dependencies**: User input events, Three.js (Renderer, Camera, OrbitControls)
+- **This Module**: Listens for resize and fullscreen events, updates renderer and camera, manages fullscreen state.
+- **Used By**: WebGL Canvas output, directly impacting the final rendered scene and user experience in the browser.

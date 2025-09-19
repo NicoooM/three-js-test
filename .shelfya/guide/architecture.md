@@ -1,51 +1,85 @@
-# Architecture Overview
+# Three.js Project Architecture
 
 ## Overview
-This project’s architecture is a modular collection of Three.js learning “exercises,” each organized in a separate folder. Each module (like 3D Text, Animation, Camera, etc.) is built and operated independently using Vite, but they share a common setup, deployment structure, and global dependencies (notably Three.js). The architecture enables developers to work on or deploy features in isolation, while maintaining a unified developer experience and build process.
+This module provides the foundational architecture for a simple Three.js web application using Vite as the build tool. The system renders a 3D object (a red cube) onto an HTML canvas by leveraging Three.js for rendering, scene and camera setup, and Vite for modern frontend tooling, development experience, and optimized builds. Its primary role is to facilitate quick prototyping and learning with a clear separation of HTML, JavaScript, and project structure.
 
 ## Key Features
-- **Modular Feature Structure**: Each main Three.js lesson (e.g., Geometries, Materials, Lights) is self-contained in its own folder with its own source code, assets, and Vite configuration.
-- **Standardized Build System**: Every module uses Vite for local development, optimized builds, and serving assets. Configurations are highly consistent across all modules.
-- **Shared Public Directory**: Assets are served from a root-level `static/` directory to ensure resources are consistently available across modules.
-- **Unified Dependency Management**: A single root `package.json` manages dependencies (notably Three.js and Vite), ensuring all modules use the same library versions and can share a node_modules folder.
-- **Consistent Developer Workflow**: Common NPM scripts (`npm run dev`, `npm run build`) provide a predictable lifecycle for starting, building, and serving each module.
-- **Isolated Output**: All build artifacts are output into individual `dist/` folders per module, to avoid conflicts and allow direct deployment/testing of any feature.
+
+- **Three.js 3D Rendering**: Renders a basic 3D scene (red cube) onto a HTML canvas element.
+- **Scene, Camera, and Object Management**: Sets up the essential Three.js objects—scene, perspective camera, mesh geometry, material, and mesh object.
+- **Customizable Canvas**: Uses a dedicated `<canvas class="webgl">` for all WebGL/Three.js drawing, allowing for easy styling or replacement.
+- **Vite Integration**: Modern build pipeline with fast dev server, hot-module reloading, optimized builds, and directory management.
+- **Configurable Output**: Build outputs and public assets are separated and configured for clarity, supporting both development and production workflows.
 
 ## System Errors
-- **Port In Use Error**: Trying to run multiple modules (`npm run dev`) at the same time may cause port conflicts (default is 8080).
-  - **Resolution**: Only run one dev server at a time, or specify a different port in the Vite config.
-- **Shared Static Asset Conflicts**: Modifying or overwriting files in the global `static/` directory can cause unexpected behavior across modules.
-  - **Resolution**: Use unique filenames and coordinate changes to shared assets.
-- **Dependency Version Mismatch**: If a module requires a version of Three.js or Vite not matching `package.json`, builds or runtime may fail.
-  - **Resolution**: Always install/update dependencies at the root with `npm install` to maintain consistency.
+
+- **Canvas Not Found**:  
+  *Description*: If the HTML canvas with class `.webgl` is missing or mistyped, Three.js will not be able to render the scene and errors may occur.  
+  *Resolution*: Ensure `<canvas class="webgl"></canvas>` exists in the HTML. Check the class name matches what is queried in JavaScript.
+
+- **Three.js Dependency Missing**:  
+  *Description*: If Three.js is not installed or is missing from `node_modules`, imports will fail and the renderer will not initialize.  
+  *Resolution*: Run `npm install` to ensure dependencies are present. Verify `three` is listed under `dependencies` in `package.json`.
+
+- **Vite Server/Build Misconfiguration**:  
+  *Description*: If directory mapping or build outputs are incorrect, project may not compile, serve, or build as expected.  
+  *Resolution*: Ensure `vite.config.js` settings match the expected directory structure (`src/` as root, build output to `dist/`). Use scripts `npm run dev` and `npm run build` as primary entry points.
 
 ## Usage Examples
 
+```js
+// src/script.js
+
+import * as THREE from 'three'
+
+// Select the canvas element
+const canvas = document.querySelector('canvas.webgl')
+
+// Create a new Three.js scene
+const scene = new THREE.Scene()
+
+// Create a red cube and add to scene
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+
+// Configure camera
+const camera = new THREE.PerspectiveCamera(75, 800 / 600)
+camera.position.z = 3
+scene.add(camera)
+
+// Initialize renderer using the selected canvas
+const renderer = new THREE.WebGLRenderer({ canvas: canvas })
+renderer.setSize(800, 600)
+renderer.render(scene, camera)
+```
+
+**To start the development server:**
 ```bash
-# Install dependencies for all modules
 npm install
-
-# Start developing in the "Geometries" module
-cd Geometries
 npm run dev
+```
 
-# Build the "Lights" module for production
-cd ../Lights
+**To build for production:**
+```bash
 npm run build
-
-# Serve a built module (after build, using a simple static server)
-npx serve dist
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  dependencies["Node.js<br>Three.js<br>Vite<br>root package.json"] --> thisModule["Modular Folder (e.g., Geometries, Lights, etc.)"]
-  dependencies --> details["[Installs dependencies via npm]"]
-  thisModule --> process["[Build/Dev Server (Vite per module)]"]
-  usedBy["Local Developer<br>Deployer<br>Learner"] --> thisModule
-  process --> consumers["Browser-based Demo/Feature"]
+  vite["Vite Build Tool"] --> project["Three.js Project Module"] --> browser["Web Browser"]
+  vite --> config["[vite.config.js: Directory & Build Configurations]"]
+  project --> threejs["[Three.js Rendering Engine]"]
+  browser --> canvas["[HTML Canvas Element]"] 
+  threejs --> scene["[Scene/Camera/Object Management]"]
+  canvas --> user["[Visual Output to User]"]
 ```
 
-This modular architecture enables developers to learn, test, and deploy Three.js features in an isolated, maintainable, and reproducible manner, while sharing core tooling across all modules.
+**Explanation**:
+- The **Vite Build Tool** compiles the code based on settings in `vite.config.js`, outputs assets, and serves them during development and for production.
+- The **Three.js Project Module** is the entry point (script.js) that manages the 3D scene setup and rendering.
+- **Three.js Rendering Engine** handles all graphical rendering and interacts with the HTML canvas.
+- The **Web Browser** interprets the HTML and JavaScript, presenting the visual output to the user using the canvas element.

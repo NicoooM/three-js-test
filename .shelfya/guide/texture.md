@@ -1,69 +1,58 @@
 # Texture Module
 
 ## Overview
-The Texture module enables Three.js applications to load, manage, and apply a variety of image textures to 3D objects in a browser environment. It facilitates the efficient import of different texture types (color, alpha, normal, etc.), connects texture loading with real-time feedback, and integrates seamlessly with Three.js scene setup. The module is essential for achieving rich, realistic visual effects and is typically used in interactive 3D experiences where materials and surface details matter.
+The **Texture Module** provides Three.js-powered functionality for loading, managing, and applying bitmap textures to 3D objects in a browser-rendered scene. It integrates seamlessly with the Three.js ecosystem to support enhanced visual realism, using features such as loading state callbacks, multiple texture types (color, alpha, normal, etc.), and configurable texture properties. The module is typically used when rendering complex 3D models that require texture maps for detail, realism, and special visual effects.
 
 ## Key Features
-- **Texture Loading via LoadingManager**: Efficiently loads images for use as textures while providing feedback on load progress, completion, or errors, improving user experience and debugging.
-- **Multiple Texture Channel Support**: Supports a range of standard texture maps, such as color, alpha, height, normal, ambient occlusion, metalness, and roughness, enabling advanced material and lighting effects.
-- **Custom Texture Filters and Parameters**: Provides options to adjust texture filtering (e.g., nearest neighbor), mipmapping, and color space, which improves visual quality and performance tuning for specific art styles (e.g., pixel art).
-- **Seamless Integration in Three.js Scenes**: Directly binds textures to 3D materials and adds them to Three.js meshes, making it easy to visually render complex objects with detailed surfaces.
-- **Interactive Controls**: Integrates with OrbitControls to enable real-time camera movement around textured objects for interactive exploration.
+- **Texture Loading with Progress Events**: Utilizes Three.js’s `LoadingManager` for tracking texture load lifecycle—start, progress, completion, and error—enabling responsive feedback or sequencing during asset loading.
+- **Support for Multiple Texture Types**: Easily load and assign multiple texture maps, such as color, alpha, height, normal, ambient occlusion, metalness, and roughness, to enhance materials and effects.
+- **Texture Configuration**: Provides direct configuration of important texture properties, such as color space, mipmaps generation, filtering modes, and wrapping, to optimize rendering quality and performance.
+- **Three.js Scene Integration**: Demonstrates direct application of loaded textures as material maps for 3D mesh objects, leveraging Three.js’s core material and geometry APIs.
+- **Interactive Camera Controls**: Bundled with OrbitControls for interactive, smooth camera navigation around textured objects.
 
 ## System Errors
-- **Texture Load Error**: Triggered when a texture file fails to load (e.g., missing file, network error).  
-  **Resolution**: Check console output from the LoadingManager's `onError` callback for the specific file; ensure texture file paths are correct and files are accessible by the web server.
-- **Canvas Not Found**: Occurs if the `<canvas class="webgl">` element is missing from the HTML, leading to rendering failures.  
-  **Resolution**: Verify that the `<canvas class="webgl">` exists in your HTML file before initializing Three.js.
-- **Invalid Texture Format**: If textures are not in a supported image format (e.g., corrupt, wrong file type), loading will fail.  
-  **Resolution**: Confirm that all textures are in standard web image formats (like PNG or JPEG).
+- **Texture Load Failure**: Occurs if a texture file is missing, corrupted, or an invalid URL is provided.
+  - **Resolution**: Check file paths, ensure files exist in the public directory, and verify correct URL usage. Use the `LoadingManager.onError` callback for custom error handling.
+- **Rendering Issues (Black/Untextured Mesh)**: Triggered when texture loading fails silently, or if incorrect texture configuration (e.g., wrong color space) is set.
+  - **Resolution**: Ensure texture URLs and file formats are valid, and `colorSpace` is accurately assigned (e.g., ` THREE.SRGBColorSpace` for most images).
+- **Performance Degradation**: May arise from large texture files, excessive mipmap generation, or over-filtering.
+  - **Resolution**: Use texture filters (`NearestFilter` for pixel art), disable unnecessary mipmaps (`generateMipmaps=false`), and optimize texture sizes.
 
 ## Usage Examples
 
 ```javascript
-// Import Three.js and controls
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// 1. Setup Texture Loader with progress/error callbacks
+const loadingManager = new THREE.LoadingManager();
+loadingManager.onStart = () => { console.log('Started loading textures'); };
+loadingManager.onProgress = () => { console.log('Texture loading in progress'); };
+loadingManager.onError = () => { console.error('Error loading texture'); };
 
-// Set up a loading manager with progress callbacks
-const loadingManager = new THREE.LoadingManager()
-loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-  console.log(`Loaded ${itemsLoaded}/${itemsTotal}: ${url}`)
-}
+const textureLoader = new THREE.TextureLoader(loadingManager);
 
-// Create a texture loader managed by the loading manager
-const textureLoader = new THREE.TextureLoader(loadingManager)
+// 2. Load texture(s) and configure
+const colorTexture = textureLoader.load('/textures/minecraft.png');
+colorTexture.colorSpace = THREE.SRGBColorSpace;
+colorTexture.magFilter = THREE.NearestFilter;
+colorTexture.generateMipmaps = false;
 
-// Load various textures
-const colorTexture = textureLoader.load('/textures/minecraft.png')
-colorTexture.colorSpace = THREE.SRGBColorSpace // Correct color rendering
-colorTexture.magFilter = THREE.NearestFilter   // Pixelated look
+// 3. Apply texture to mesh material
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ map: colorTexture });
+const mesh = new THREE.Mesh(geometry, material);
 
-// Typical usage: apply color texture to a mesh material
-const material = new THREE.MeshBasicMaterial({ map: colorTexture })
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const mesh = new THREE.Mesh(geometry, material)
-
-// Add mesh to scene, set up camera and controls
-const scene = new THREE.Scene()
-scene.add(mesh)
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
-camera.position.set(1, 1, 1)
-const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('canvas.webgl') })
-renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.render(scene, camera)
+// 4. Add mesh to scene and set up camera/controls
+scene.add(mesh);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
+// Setup controls, renderer, and animate as in main script
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  fs["Static File Server (assets/textures)"] --> textureModule["Texture Module"]
-  textureModule["Texture Module"] --> threejs["Three.js Scene & Renderer"]
-  threejs --> userView["User's Browser (3D Visualization)"]
-  textureModule --> loadingManager["THREE.LoadingManager"]
-  textureModule --> controls["OrbitControls"]
-  loadingManager --> devConsole["Developer Console"]
-  threejs --> controls
-  controls --> userInput["User Input: Mouse/Touch"]
+  dependencies["Three.js Library, Static Assets Folder (/textures)"] --> thisModule["Texture Module"]
+  dependencies --> details["[LoadingManager, TextureLoader, OrbitControls, MeshBasicMaterial]"]
+  thisModule --> process["[Texture Loading, Configuration, Mapping to Objects]"]
+  thisModule --> usedBy["Application Scene"]
+  usedBy --> consumers["[End User's Browser, Canvas/WebGL Renderer]"]
 ```

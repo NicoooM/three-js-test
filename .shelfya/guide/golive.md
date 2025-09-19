@@ -1,58 +1,63 @@
-# GoLive 3D Scene Module
+# GoLive Three.js Visualization Module
 
 ## Overview
-The **GoLive 3D Scene Module** is a feature-rich, embeddable component for rendering interactive 3D scenes using [Three.js](https://threejs.org/). It enables the display of custom 3D text with "matcap" material effects, surrounded by multiple randomly-distributed torus ("donut") shapes. The module is designed to serve as a learning or demo platform for real-time 3D web graphics, providing intuitive camera controls and automatic adaptation to viewport changes. It integrates seamlessly into browser-based applications by mounting onto a `<canvas>` element.
+The GoLive module renders an interactive 3D visualization using Three.js. It displays dynamic 3D text and a visually rich scene with randomized "donut" meshes, leveraging real-time controls and responsive adjustments. This module is designed for rapid prototyping, demos, or educational showcases of core Three.js concepts and user-experience interactivity. It integrates smoothly into modern frontend projects using Vite as a build tool.
 
 ## Key Features
-
-- **3D Text Rendering**: Creates and centers a customizable 3D text geometry, using externally loaded font data and advanced material effects for rich visual presentation.
-- **Randomized Donut Field**: Populates the scene with 100 torus meshes, each randomly positioned, rotated, and scaled, adding a dynamic spatial environment around the focal text.
-- **Flexible Camera & Controls**: Includes an interactive perspective camera with orbiting and damping functionalities, allowing users to navigate the 3D scene intuitively.
-- **Responsive Rendering**: Automatically responds to browser window resizing to maintain correct aspect ratio and pixel density, ensuring consistent visual quality across devices.
-- **Matcap Material Support**: Utilizes a matcap texture for material, providing visually pleasing, efficiently-rendered shading effects without complex lighting calculations.
-- **Modular Integration**: Hooks into any HTML page with a `<canvas class="webgl">` element, supporting ES module imports and intuitive initialization.
+- **Interactive 3D Scene**: Renders a real-time 3D environment with animated camera controls and dynamic lighting, providing immersive user interaction.
+- **Customizable 3D Text**: Loads custom font geometry and renders 3D text with matcap materials, demonstrating Three.js text rendering capabilities.
+- **Procedurally Generated Meshes**: Automatically distributes and scales multiple 3D torus ("donut") objects throughout the scene for visual density and variation.
+- **Responsive Rendering**: Listens to window resize events to dynamically adjust camera and renderer settings, ensuring consistent display across devices.
+- **User Controls Integration**: Incorporates OrbitControls for smooth camera navigation and lil-gui for potential real-time parameter adjustments and debugging.
+- **Seamless Build & Dev Workflow**: Utilizes Vite for development and production builds, supporting quick iterations and easy deployment.
 
 ## System Errors
 
-- **Asset Loading Errors**:  
-  _Description_: Font or texture assets may fail to load if paths are incorrect or files are missing (e.g., `/fonts/helvetiker_regular.typeface.json` or `textures/matcaps/8.png`).  
-  _Resolution_: Ensure asset files exist at specified locations and paths are correct relative to the root or distribution folder.
+- **Texture or Font Asset Not Found**:  
+  *Description*: If texture (`textures/matcaps/8.png`) or font (`fonts/helvetiker_regular.typeface.json`) files are missing or follow incorrect paths, 3D materials or text may not render at all.  
+  *Resolution*: Ensure the referenced asset files exist at the specified paths in your static/public directory and are accessible by the server.
 
-- **Canvas Not Found**:  
-  _Description_: If the target `<canvas class="webgl">` element is missing from the DOM, the scene will not render and JavaScript errors may occur.  
-  _Resolution_: Confirm that your HTML includes exactly one canvas element with class `webgl`.
+- **Canvas Element Missing**:  
+  *Description*: If there is no `<canvas class="webgl">` in the HTML, rendering will fail and `Three.js` will not attach the scene.  
+  *Resolution*: Confirm that the HTML includes a `<canvas class="webgl"></canvas>` element as required.
 
-- **WebGL Not Supported**:  
-  _Description_: Older browsers or unsupported platforms may not support WebGL, causing rendering failures.  
-  _Resolution_: Advise users to use a WebGL-compatible browser (e.g., recent Chrome, Firefox, Edge).
+- **Renderer or Camera Resize Issue**:  
+  *Description*: Unexpected behavior or aspect ratio distortion can occur if window resize events are not handled correctly.  
+  *Resolution*: Make sure the event listeners and update logic are intact and not modified in a way that would break renderer or camera updates.
 
 ## Usage Examples
 
 ```js
-// index.html
-// Ensure HTML includes:
-<canvas class="webgl"></canvas>
+// To use GoLive module, ensure required dependencies and assets are present,
+// then run the development server:
 
-// script.js (ES module)
+// Terminal commands:
+npm install      // Install dependencies (three, lil-gui, vite)
+npm run dev      // Start development server (default: http://localhost:8080)
+
+// Key integration in src/index.html:
+<canvas class="webgl"></canvas>
+<script type="module" src="./script.js"></script>
+
+// Main Three.js setup (see script.js):
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import GUI from 'lil-gui'
 
-// No explicit API construction needed—module will auto-initialize and render
-// 3D scene when loaded, mounting onto 'canvas.webgl' element
+// Scene setup, text rendering, mesh generation, camera/responsiveness,
+// and animation are handled automatically by src/script.js when included.
 ```
-
-This module is auto-initializing and doesn't require manual instantiation. Place your `<canvas>` in HTML, ensure expected assets (font files, matcap textures) exist in the appropriate paths, and the 3D scene will display and respond to navigation or resizing automatically.
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  dependencies["HTML Canvas<br/>Three.js<br/>Textures<br/>Fonts"] --> thisModule["GoLive 3D Scene Module"]
-  thisModule --> usedBy["End User Browser<br/>/ Application Webpage"]
-  dependencies --> details["<b>Fonts:</b> helvetiker_regular.typeface.json<br/><b>Textures:</b> matcaps/8.png"]
-  thisModule --> process["<b>Renders:</b> 3D Text + Donuts<br/><b>Handles:</b> Resize, Controls, Rendering Loop"]
-  usedBy --> consumers["Visitors/Users viewing<br/>the 3D web page"]
+  dependencies["Three.js, lil-gui, Vite, Font & Texture Assets"]
+    --> thisModule["GoLive 3D Visualization Module"]
+    --> usedBy["Frontend App (index.html/Web Page)"]
+  dependencies --> details["three (core), OrbitControls, FontLoader, TextGeometry, matcap texture, custom font"]
+  thisModule --> process["3D Scene Setup & Rendering, Interactive Controls, Responsive Canvas"]
+  usedBy --> consumers["Developers, End Users/Viewers"]
 ```

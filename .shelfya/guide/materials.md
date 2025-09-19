@@ -1,102 +1,83 @@
 # Materials Module
 
 ## Overview
-The Materials module demonstrates advanced material rendering in Three.js, showcasing how to combine multiple physically-based parameters and texture maps for realistic surface effects. It serves as an interactive example where users can explore and tweak material properties in real-time using a GUI, view results across common geometry types, and see the effect of environmental lighting. The module’s primary goal is to teach and provide a starting template for realistic material configuration and visualization in browser-based 3D scenes.
+The **Materials Module** provides a feature-rich integration of physically-accurate and stylized materials using [three.js](https://threejs.org/) for 3D visualizations. It enables loading, configuring, and combining various material effects such as metalness, roughness, transparency, normal mapping, and environment mapping. This module is designed to demonstrate or prototype real-time 3D material behaviors in web applications, with interactive controls for fine-tuning material properties.
 
 ## Key Features
-
-- **Physically-Based Materials**: Utilizes `MeshPhysicalMaterial` to simulate real-world surface properties, enabling effects such as metalness, roughness, transmission, and more.
-- **Multi-Map Texturing**: Supports color, alpha, ambient occlusion, height (displacement), normal, metalness, and roughness maps for detailed and varied material appearances.
-- **Environmental Lighting**: Integrates HDR environment maps for realistic lighting and reflections, affecting material appearance dynamically.
-- **Interactive Parameter Control**: Includes a live GUI (via lil-gui) to adjust material properties (metalness, roughness, transmission, thickness, IOR, etc.) and instantly observe changes.
-- **Multiple Geometries**: Applies the material to different mesh shapes (sphere, plane, torus) to demonstrate the effect of properties across geometries.
-- **Responsive Rendering**: Adjusts rendering and camera on window resize for an always-optimal viewport and pixel ratio.
-- **Camera Controls**: Employs orbital camera controls for user-friendly scene exploration.
+- **Physically-Based Rendering (PBR) Materials**: Supports advanced three.js materials, including `MeshPhysicalMaterial` for realistic rendering.
+- **Texture Loading and Mapping**: Automatic loading and assignment of multiple texture maps (albedo, normal, metalness, roughness, ambient occlusion, etc.).
+- **Environment Mapping**: Integration with HDR environment maps for accurate lighting and reflections.
+- **Real-time UI Controls**: Interactive GUI for tweaking key material properties like metalness, roughness, ior, and transparency live in the browser.
+- **Object Material Sharing**: Single material instance can be assigned to multiple mesh objects for consistent visual style.
+- **Responsive Rendering**: Adapts rendering and camera parameters on window resize for optimal display.
+- **Orbit Controls**: Seamless camera navigation for inspecting material effects in 3D.
 
 ## System Errors
-
 - **Texture Loading Error**:  
-  _Description_: If texture files are missing or paths are incorrect, textures will fail to load and surfaces may render incorrectly or as solid colors.  
-  _Resolution_: Ensure all referenced texture files exist at the given paths (`./textures/...`). Check browser console for loading errors.
+  _Description_: If a required texture file is missing or misnamed, the relevant map (e.g., normal, diffuse) may be blank, or errors/warnings may appear in the browser console.  
+  _Resolution_: Verify that all texture paths are correct and files are present under the `textures/` directory.
 
-- **WebGL Context Not Supported**:  
-  _Description_: On unsupported browsers or devices, the canvas may fail to initialize a WebGL context, resulting in a blank scene.  
-  _Resolution_: Use an up-to-date browser with WebGL support. Verify hardware acceleration is enabled.
+- **HDR Environment Map Load Failure**:  
+  _Description_: If the HDR file cannot be loaded, background and reflections will not appear as intended, resulting in flat shading or incorrect lighting.  
+  _Resolution_: Ensure the HDR file exists at the specified path and is a valid format supported by RGBELoader.
 
-- **GUI/Controls Not Responsive After Resize**:  
-  _Description_: If the renderer or camera fails to update, aspect ratios may appear distorted or controls can become misaligned.  
-  _Resolution_: Confirm the resize event is firing and the handler appropriately updates both the camera and renderer. Refresh browser if necessary.
+- **GUI/Property Mutation Error**:  
+  _Description_: Properties edited in the GUI may not take effect if the material property name is incorrect or not supported by the selected material type.  
+  _Resolution_: Use the provided controls as-is and check material type before adding new controls.
 
 ## Usage Examples
 
-```javascript
-// Import Three.js and dependencies
+```js
+// Import necessary three.js modules
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import GUI from 'lil-gui'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import GUI from 'lil-gui'
 
-// 1. Setup scene, camera, renderer, and canvas
-const canvas = document.querySelector('canvas.webgl')
+// Set up scene, camera, and WebGL renderer using a <canvas> with class "webgl".
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100)
-camera.position.set(1, 1, 2)
-scene.add(camera)
+const canvas = document.querySelector('canvas.webgl')
 const renderer = new THREE.WebGLRenderer({ canvas })
-renderer.setSize(window.innerWidth, window.innerHeight)
 
-// 2. Load textures and configure material
+// Load textures for PBR material
 const textureLoader = new THREE.TextureLoader()
+const colorMap = textureLoader.load('./textures/door/color.jpg')
+// ... load other required textures (normal, roughness, etc.)
+
+// Configure a MeshPhysicalMaterial with multiple texture maps and PBR properties
 const material = new THREE.MeshPhysicalMaterial({
-  map: textureLoader.load('./textures/door/color.jpg'),
+  map: colorMap,
   metalness: 0.7,
   roughness: 0.2,
   transparent: true,
   alphaMap: textureLoader.load('./textures/door/alpha.jpg'),
-  aoMap: textureLoader.load('./textures/door/ambientOcclusion.jpg'),
-  displacementMap: textureLoader.load('./textures/door/height.jpg'),
-  displacementScale: 0.2,
-  metalnessMap: textureLoader.load('./textures/door/metalness.jpg'),
-  roughnessMap: textureLoader.load('./textures/door/roughness.jpg'),
-  normalMap: textureLoader.load('./textures/door/normal.jpg'),
-  normalScale: new THREE.Vector2(0.5, 0.5),
-  transmission: 1,
-  ior: 1.5,
-  thickness: 0.5
+  /* assign other maps as needed */
 })
 
-// 3. Add meshes
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material)
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 100, 100), material)
-const torus = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.2, 64, 128), material)
-scene.add(sphere, plane, torus)
+// Add live GUI controls (optional)
+const gui = new GUI()
+gui.add(material, 'metalness').min(0).max(1).step(0.0001)
+gui.add(material, 'roughness').min(0).max(1).step(0.0001)
 
-// 4. Apply environment map
+// Create meshes and add to scene
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material)
+scene.add(sphere)
+
+// Set up HDR environment map (background/reflection)
 const rgbeLoader = new RGBELoader()
-rgbeLoader.load('./textures/environmentMap/2k.hdr', (envMap) => {
+rgbeLoader.load('./textures/environmentMap/2k.hdr', envMap => {
   envMap.mapping = THREE.EquirectangularReflectionMapping
   scene.background = envMap
   scene.environment = envMap
 })
 
-// 5. Add controls and GUI
+// Add orbit controls and start animation/render loop
 const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
-const gui = new GUI()
-gui.add(material, 'metalness', 0, 1, 0.0001)
-gui.add(material, 'roughness', 0, 1, 0.0001)
-gui.add(material, 'transmission', 0, 1, 0.0001)
-gui.add(material, 'ior', 1, 10, 0.0001)
-gui.add(material, 'thickness', 0, 1, 0.0001)
-
-// 6. Render loop with rotation animation
 function animate() {
-  requestAnimationFrame(animate)
-  sphere.rotation.y += 0.01
-  plane.rotation.y += 0.01
-  torus.rotation.y += 0.01
   controls.update()
   renderer.render(scene, camera)
+  requestAnimationFrame(animate)
 }
 animate()
 ```
@@ -105,12 +86,19 @@ animate()
 
 ```mermaid
 flowchart LR
-  threejs["Three.js Library/Dependencies"] --> materialsModule["Materials Module"]
-  lilgui["lil-gui (UI Controls)"] --> materialsModule
-  textureAssets["Texture Assets (images, .hdr)"] --> materialsModule
-  materialsModule --> browserApp["Browser WebGL App"]
-  browserApp --> user["End User / Learner"]
-  materialsModule --> sceneObjects["3D Scene Objects"]
-  materialsModule --> environmentMap["Environment Map"]
-  environmentMap --> sceneObjects
+  dependencies["Dependencies"] --> thisModule["Materials Module"] --> usedBy["Used By"]
+  dependencies --> details["three.js, lil-gui, OrbitControls, RGBELoader"]
+  thisModule --> process["Scene graph / Material assignment"]
+  thisModule --> process2["Texture resource loading"]
+  thisModule --> process3["Environment Map integration"]
+  usedBy --> consumers["App UI & 3D components (scene, camera, mesh)"]
 ```
+**Legend**:  
+- **Dependencies**: third-party libraries (three.js, lil-gui, loaders)  
+- **This Module**: Material configuration & runtime control  
+- **Used By**: Application's scene setup and 3D UI components  
+- **Process** nodes: Material attached to meshes, resource loading, environmental effects
+
+---
+
+This module enables interactive, realistic material exploration in web-based 3D scenes, streamlining texture management and real-time adjustments for artists and developers.

@@ -1,58 +1,61 @@
 # Camera Module
 
 ## Overview
-The Camera module provides fundamental 3D camera functionality within a Three.js-powered scene. It sets up and manages cameras, their controls, and user interactions to enable seamless navigation and visualization of 3D content. The module is central to rendering scenes, as it defines the point of view and interaction mechanisms for end users.
+The Camera module provides interactive camera management for Three.js 3D scenes. It enables users to view, navigate, and manipulate perspectives within rendered environments, a crucial part of any 3D application. The module also integrates user input (mouse movements) to facilitate dynamic scene exploration using orbit controls.
 
 ## Key Features
-- **3D Camera Initialization**: Instantiates a PerspectiveCamera for rendering 3D scenes, with built-in support for changing the camera type if needed.
-- **User Interaction via OrbitControls**: Allows users to rotate, zoom, and pan around the scene interactively using mouse or touch input.
-- **Cursor Tracking for Dynamic Camera**: Tracks mouse cursor movement, enabling additional camera manipulation or interactivity based on user input (configurable in code).
-- **Scene Integration**: Attaches the camera to a central Three.js scene, ensuring all renderings originate from the defined viewpoint.
-- **Responsive Rendering**: Configures the renderer to use appropriate viewport dimensions and updates on each animation frame for smooth visuals.
+- **Perspective Camera Rendering**: Sets up and manages a Three.js perspective camera, enabling 3D scene visualization with user-controllable viewpoint.
+- **Orbit Controls Integration**: Allows users to navigate and orbit around scene objects using standard drag-and-pan mouse gestures.
+- **Dynamic Canvas Sizing**: Configures the rendering canvas for consistent display and viewport sizing.
+- **Real-Time Interaction**: Responds immediately to user mouse movements, updating the camera's view and scene rendering continuously.
 
 ## System Errors
-- **Canvas Not Found**: 
-  - *Description*: The module expects a `<canvas class="webgl">` element in the DOM. If missing, rendering and controls initialization will fail.
-  - *Resolution*: Ensure the HTML includes `<canvas class="webgl"></canvas>` before loading the script.
-- **Missing Three.js or OrbitControls**: 
-  - *Description*: If Three.js or its OrbitControls add-on is not imported properly, camera setup and controls will not function.
-  - *Resolution*: Confirm all Three.js dependencies are correctly installed and imported.
-- **Incorrect Canvas Sizing**: 
-  - *Description*: If the sizes object does not match the actual canvas size, rendering may appear distorted.
-  - *Resolution*: Update the `sizes` object to reflect the real width and height or make it dynamic based on window size.
+- **Canvas Not Found**: If the target canvas (`.webgl`) is not present in the HTML, camera controls and rendering will not function.  
+  *Resolution*: Ensure the HTML includes `<canvas class="webgl"></canvas>` before initializing the Camera module.
+- **THREE or OrbitControls Import Error**: If Three.js or OrbitControls are improperly imported, runtime errors will occur.  
+  *Resolution*: Verify package installation (`npm install three`) and proper import statements.
+- **Invalid Canvas Size**: If the dimensions defined in `sizes` do not match the actual canvas size, rendering output may appear stretched or skewed.  
+  *Resolution*: Adjust `sizes` to match desired viewport or make canvas responsive.
 
 ## Usage Examples
-Practical code showing integration with Three.js and HTML canvas:
+Practical code example showing camera setup and application of controls in a Three.js scene:
 
-```js
+```javascript
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
-// Set up sizes
+// Canvas and sizes
+const canvas = document.querySelector('canvas.webgl')
 const sizes = { width: 800, height: 600 }
 
-// Create scene, camera, and renderer
+// Scene and mesh
 const scene = new THREE.Scene()
+const mesh = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
+  new THREE.MeshBasicMaterial({ color: 0xff0000 })
+)
+scene.add(mesh)
+
+// Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
 camera.position.z = 2
+camera.lookAt(mesh.position)
 scene.add(camera)
 
-const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('canvas.webgl')
-})
-renderer.setSize(sizes.width, sizes.height)
-
-// Add orbit controls for interaction
-const controls = new OrbitControls(camera, renderer.domElement)
+// Controls for interactive navigation
+const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
-// Render loop
-function animate() {
-    controls.update() // for smooth controls
-    renderer.render(scene, camera)
-    requestAnimationFrame(animate)
-}
+// Renderer
+const renderer = new THREE.WebGLRenderer({ canvas })
+renderer.setSize(sizes.width, sizes.height)
 
+// Animation loop
+function animate() {
+  controls.update()
+  renderer.render(scene, camera)
+  requestAnimationFrame(animate)
+}
 animate()
 ```
 
@@ -60,9 +63,8 @@ animate()
 
 ```mermaid
 flowchart LR
-  dependencies["Three.js Library<br/>OrbitControls Add-on"] --> thisModule["Camera Module"]
-  thisModule --> usedBy["3D Scene Rendering Pipeline"]
-  dependencies --> details["PerspectiveCamera<br/>Scene<br/>WebGLRenderer"]
-  thisModule --> process["User Input<br/>Camera/Scene Updates"]
-  usedBy --> consumers["End Users<br/>Other Modules (e.g., Object Manipulation)"]
+  dependencies["Dependencies"] --> thisModule["Camera Module"] --> usedBy["Used By"]
+  dependencies --> details["[Three.js, OrbitControls, Canvas]"]
+  thisModule --> process["[Camera Controls, Scene Rendering]"] 
+  usedBy --> consumers["[3D Application UI, Interactive Viewers]"]
 ```

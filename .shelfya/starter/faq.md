@@ -1,47 +1,41 @@
-# FAQ Module
+# Three.js Starter FAQ
 
 ## Overview
-The FAQ Module provides concise answers to common questions about setting up, running, and building the Three.js Journey project. It helps users get started, resolve typical onboarding issues, and understand key project workflows.
+This module provides a starter setup for developing 3D web applications using Three.js. It streamlines environment configuration, dependency management, and standard development workflows, making it easier for developers to quickly build, run, and deploy Three.js projects.
 
 ## Key Features
-- **Setup Guidance**: Instructs users on installing dependencies and required software.
-- **Development Server Instructions**: Explains how to launch and access the local development environment.
-- **Production Build Workflow**: Details the process to generate a production-ready build.
-- **Troubleshooting Support**: Offers resolutions for common errors during setup and usage.
+- **Automated Dependency Installation**: Installs all required packages for a Three.js project with a single command.
+- **Local Development Server**: Launches a local server at `localhost:8080` for live preview and iterative development.
+- **Production Build Pipeline**: Generates optimized static assets in the `dist/` directory, making it easy to deploy the finished application.
 
 ## System Errors
-- **Missing Node.js**: The project requires Node.js to run.  
-  *Resolution*: Download and install Node.js from [nodejs.org](https://nodejs.org/en/download/).
-- **Dependency Installation Errors**: Errors during `npm install` often indicate missing or incompatible packages.  
-  *Resolution*: Ensure you have a recent version of Node.js and npm. Delete `node_modules` and `package-lock.json` and run `npm install` again.
-- **Port Already in Use**: Running `npm run dev` may fail if port 8080 is occupied.  
-  *Resolution*: Close conflicting applications or modify the server port.
+- **Dependency Installation Failure**: Occurs if `npm install` cannot fetch or install all dependencies.  
+  *Resolution*: Ensure internet connection, correct Node.js version, and try running `npm install` again. Check for error messages indicating specific missing packages.
+- **Port Already in Use**: Happens if another process is using port 8080 when starting the development server.  
+  *Resolution*: Stop the conflicting process or edit the server's port configuration.
+- **Build Failures**: Build process stops due to missing files or syntax errors.  
+  *Resolution*: Review the console error output, fix code issues, and rerun `npm run build`.
 
 ## Usage Examples
 
 ```bash
-# 1. Download and install Node.js from the official website:
-#    https://nodejs.org/en/download/
-
-# 2. Install project dependencies (only needed once):
+# 1. Install all dependencies (first-time setup)
 npm install
 
-# 3. Start the development server:
+# 2. Start the development server at localhost:8080
 npm run dev
-# Access the project at http://localhost:8080
 
-# 4. Build the project for production:
+# 3. Build the app for production (output in 'dist/')
 npm run build
-# Output files will be in the 'dist/' directory
 ```
 
 ## System Integration
 
 ```mermaid
 flowchart LR
-  nodejs["Node.js"] --> faqModule["FAQ Module"] --> user["Developer/End-User"]
-  nodejs --> starterProject["Starter Project"]
-  faqModule --> setup["Setup Guidance"]
-  faqModule --> troubleshooting["Troubleshooting"]
-  user --> workflow["Project Workflows (dev/build)"]
+  nodejs["Node.js & NPM"] --> threejsStarter["Three.js Starter Module"] --> localServer["Local Server (Dev)"]
+  nodejs --> depsInstall["Dependency Installation"]
+  threejsStarter --> buildPipeline["Build Pipeline (Production)"]
+  localServer --> developers["Developers"]
+  buildPipeline --> deployment["Deployment Target (dist/)"]
 ```
